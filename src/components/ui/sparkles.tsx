@@ -80,7 +80,7 @@ export const SparklesCore = (props: ParticlesProps) => {
                   enable: false,
                   mode: "repulse",
                 },
-                resize: true as any,
+                resize: true,
               },
               modes: {
                 push: {
@@ -158,7 +158,7 @@ export const SparklesCore = (props: ParticlesProps) => {
                 fill: true,
                 options: {},
                 type: {} as SingleOrMultiple<string> | undefined,
-              } as any,
+              },
               groups: {},
               move: {
                 angle: {
@@ -219,7 +219,7 @@ export const SparklesCore = (props: ParticlesProps) => {
                 },
                 vibrate: false,
                 warp: false,
-              } as any,
+              },
               number: {
                 density: {
                   enable: true,
@@ -266,7 +266,7 @@ export const SparklesCore = (props: ParticlesProps) => {
                 fill: true,
                 options: {},
                 type: "circle",
-              } as any,
+              },
               size: {
                 value: {
                   min: minSize || 1,

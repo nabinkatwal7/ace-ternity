@@ -42,13 +42,7 @@ export const MacbookScroll = ({
     offset: ["start start", "end start"],
   });
 
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    if (window && window.innerWidth < 768) {
-      setIsMobile(true);
-    }
-  }, []);
+  const [isMobile] = useState(() => typeof window !== "undefined" && window.innerWidth < 768);
 
   const scaleX = useTransform(
     scrollYProgress,

@@ -486,6 +486,7 @@ export const Globe = ({ className }: { className?: string }) => {
 
   useEffect(() => {
     let phi = 0;
+    let animationId: number;
 
     if (!canvasRef.current) return;
 
@@ -503,17 +504,20 @@ export const Globe = ({ className }: { className?: string }) => {
       markerColor: [0.1, 0.8, 1],
       glowColor: [1, 1, 1],
       markers: [
-        // longitude latitude
         { location: [37.7595, -122.4367], size: 0.03 },
         { location: [40.7128, -74.006], size: 0.1 },
       ],
-      onRender: (state) => {
-        state.phi = phi;
-        phi += 0.01;
-      },
     });
 
+    const animate = () => {
+      phi += 0.01;
+      globe.update({ phi });
+      animationId = requestAnimationFrame(animate);
+    };
+    animate();
+
     return () => {
+      cancelAnimationFrame(animationId);
       globe.destroy();
     };
   }, []);

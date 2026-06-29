@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState, memo } from "react";
 import { motion } from "motion/react";
+import { useMemo } from "react";
 import { twMerge } from "tailwind-merge";
 import { cn } from "@/lib/utils";
 
@@ -16,7 +17,7 @@ export const TextRevealCard = ({
   className?: string;
 }) => {
   const [widthPercentage, setWidthPercentage] = useState(0);
-  const cardRef = useRef<HTMLDivElement | any>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const [left, setLeft] = useState(0);
   const [localWidth, setLocalWidth] = useState(0);
   const [isMouseOver, setIsMouseOver] = useState(false);
@@ -30,7 +31,7 @@ export const TextRevealCard = ({
     }
   }, []);
 
-  function mouseMoveHandler(event: any) {
+  function mouseMoveHandler(event: React.MouseEvent<HTMLDivElement>) {
     event.preventDefault();
 
     const { clientX } = event;
@@ -148,29 +149,38 @@ export const TextRevealCardDescription = ({
 };
 
 const Stars = () => {
-  const randomMove = () => Math.random() * 4 - 2;
-  const randomOpacity = () => Math.random();
-  const random = () => Math.random();
+  const starData = useMemo(
+    () =>
+      Array.from({ length: 80 }, () => ({
+        top: Math.random() * 100,
+        left: Math.random() * 100,
+        moveX: Math.random() * 4 - 2,
+        moveY: Math.random() * 4 - 2,
+        opacity: Math.random(),
+        duration: Math.random() * 10 + 20,
+      })),
+    [],
+  );
   return (
     <div className="absolute inset-0">
-      {[...Array(80)].map((_, i) => (
+      {starData.map((star, i) => (
         <motion.span
           key={`star-${i}`}
           animate={{
-            top: `calc(${random() * 100}% + ${randomMove()}px)`,
-            left: `calc(${random() * 100}% + ${randomMove()}px)`,
-            opacity: randomOpacity(),
+            top: `calc(${star.top}% + ${star.moveX}px)`,
+            left: `calc(${star.left}% + ${star.moveY}px)`,
+            opacity: star.opacity,
             scale: [1, 1.2, 0],
           }}
           transition={{
-            duration: random() * 10 + 20,
+            duration: star.duration,
             repeat: Infinity,
             ease: "linear",
           }}
           style={{
             position: "absolute",
-            top: `${random() * 100}%`,
-            left: `${random() * 100}%`,
+            top: `${star.top}%`,
+            left: `${star.left}%`,
             width: `2px`,
             height: `2px`,
             backgroundColor: "white",

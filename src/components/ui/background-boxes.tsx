@@ -1,12 +1,12 @@
 "use client";
-import React from "react";
+import React, { useMemo } from "react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
 export const BoxesCore = ({ className, ...rest }: { className?: string }) => {
   const rows = new Array(150).fill(1);
   const cols = new Array(100).fill(1);
-  let colors = [
+  const colors = [
     "#93c5fd",
     "#f9a8d4",
     "#86efac",
@@ -17,9 +17,13 @@ export const BoxesCore = ({ className, ...rest }: { className?: string }) => {
     "#a5b4fc",
     "#c4b5fd",
   ];
-  const getRandomColor = () => {
-    return colors[Math.floor(Math.random() * colors.length)];
-  };
+  const randomColors = useMemo(
+    () =>
+      rows.map(() =>
+        cols.map(() => colors[Math.floor(Math.random() * colors.length)])
+      ),
+    []
+  );
 
   return (
     <div
@@ -40,7 +44,7 @@ export const BoxesCore = ({ className, ...rest }: { className?: string }) => {
           {cols.map((_, j) => (
             <motion.div
               whileHover={{
-                backgroundColor: `${getRandomColor()}`,
+                backgroundColor: randomColors[i][j],
                 transition: { duration: 0 },
               }}
               animate={{

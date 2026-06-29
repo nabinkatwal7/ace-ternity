@@ -105,8 +105,11 @@ export const MultiStepLoader = ({
   useEffect(() => {
     if (!loading) {
       setCurrentState(0);
-      return;
     }
+  }, [loading]);
+
+  useEffect(() => {
+    if (!loading) return;
     const timeout = setTimeout(() => {
       setCurrentState((prevState) =>
         loop

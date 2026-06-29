@@ -301,8 +301,6 @@ export function Terminal({
   const inView = useInView(containerRef);
   const { down, up } = useAudio(enableSound);
 
-  const [lines, setLines] = useState<TerminalLine[]>([]);
-  const [currentText, setCurrentText] = useState("");
   const [commandIdx, setCommandIdx] = useState(0);
   const [charIdx, setCharIdx] = useState(0);
   const [outputIdx, setOutputIdx] = useState(-1);
@@ -317,6 +315,36 @@ export function Terminal({
     [outputs, commandIdx],
   );
   const isLastCommand = commandIdx === commands.length - 1;
+
+  const lines = useMemo(() => {
+    const submittedCount =
+      phase === "done"
+        ? commands.length
+        : phase === "idle" || phase === "typing"
+          ? commandIdx
+          : commandIdx + 1;
+    const result: TerminalLine[] = [];
+    for (let i = 0; i < submittedCount; i++) {
+      result.push({ type: "command", content: commands[i] });
+      const cmdOutputs = outputs[i] || [];
+      if (i < commandIdx) {
+        cmdOutputs.forEach((o) => result.push({ type: "output", content: o }));
+      } else if (i === commandIdx && phase === "outputting") {
+        cmdOutputs
+          .slice(0, Math.max(0, outputIdx))
+          .forEach((o) => result.push({ type: "output", content: o }));
+      } else if (
+        i === commandIdx &&
+        (phase === "pausing" || phase === "done")
+      ) {
+        cmdOutputs.forEach((o) => result.push({ type: "output", content: o }));
+      }
+    }
+    return result;
+  }, [commandIdx, phase, outputIdx, commands, outputs]);
+
+  const currentText =
+    phase === "typing" ? commands[commandIdx]?.slice(0, charIdx) ?? "" : "";
 
   useEffect(() => {
     if (!inView || phase !== "idle") return;
@@ -333,7 +361,6 @@ export function Terminal({
       const t = setTimeout(
         () => {
           up(char);
-          setCurrentText(currentCommand.slice(0, charIdx + 1));
           setCharIdx((c) => c + 1);
         },
         typingSpeed + Math.random() * 30,
@@ -352,9 +379,6 @@ export function Terminal({
   useEffect(() => {
     if (phase !== "executing") return;
 
-    setLines((prev) => [...prev, { type: "command", content: currentCommand }]);
-    setCurrentText("");
-
     if (currentOutputs.length > 0) {
       setOutputIdx(0);
       setPhase("outputting");
@@ -370,10 +394,6 @@ export function Terminal({
 
     if (outputIdx >= 0 && outputIdx < currentOutputs.length) {
       const t = setTimeout(() => {
-        setLines((prev) => [
-          ...prev,
-          { type: "output", content: currentOutputs[outputIdx] },
-        ]);
         setOutputIdx((i) => i + 1);
       }, 150);
       return () => clearTimeout(t);
